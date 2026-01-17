@@ -1,0 +1,23 @@
+# Git履歴をリセットして再プッシュするコマンド
+
+# 以下のコマンドをPowerShellで順番に実行してください
+
+# 1. 既存の.gitフォルダをバックアップ
+Move-Item -Path .git -Destination .git.backup -ErrorAction SilentlyContinue
+
+# 2. 新しいGitリポジトリを初期化
+git init
+git branch -M main
+
+# 3. ファイルを追加（.env.localは自動的に除外されます）
+git add .
+
+# 4. 新しいコミットを作成
+git commit -m "Initial commit - API keys removed"
+
+# 5. リモートを追加（YOUR_TOKENを実際のPersonal Access Tokenに置き換えてください）
+git remote add origin https://creatorsgardenofficial:YOUR_TOKEN@github.com/creatorsgardenofficial/Alice-s-Tea-Party.git
+
+# 6. 強制プッシュ
+git push -u origin main --force
+

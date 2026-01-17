@@ -1,0 +1,125 @@
+'use client'
+
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import type { DebateConfig } from '@/types'
+
+interface DebateFormProps {
+  onStart: (config: DebateConfig) => void
+}
+
+export default function DebateForm({ onStart }: DebateFormProps) {
+  const [topic, setTopic] = useState('お金と時間どちらが大切なのか')
+  const [alicePosition, setAlicePosition] = useState('時間の方が大切。なぜならば、お金があっても時間がなくては、そのお金は使えない。時間さえあれば、十分な時間を使って、なんでも叶えることができる。')
+  const [rabbitPosition, setRabbitPosition] = useState('お金の方が大切。なぜならば、時間がいくらあっても、お金がなければ活動できることは限られてしまう。お金さえあれば、短い時間でも有意義に過ごすことができる。')
+  const [turns, setTurns] = useState(6)
+
+  const handleTurnsChange = (value: number) => {
+    // 偶数に調整（2以上、20以下）
+    let adjustedValue = Math.max(2, Math.min(20, value))
+    if (adjustedValue % 2 !== 0) {
+      // 奇数の場合は最も近い偶数に調整
+      adjustedValue = adjustedValue < 20 ? adjustedValue + 1 : adjustedValue - 1
+    }
+    setTurns(adjustedValue)
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // 念のため偶数であることを確認
+    const finalTurns = turns % 2 === 0 ? turns : turns + 1
+    console.log('フォーム送信:', { topic, alicePosition, rabbitPosition, turns: finalTurns })
+    try {
+      onStart({
+        topic,
+        alicePosition,
+        rabbitPosition,
+        turns: finalTurns,
+      })
+      console.log('onStart呼び出し完了')
+    } catch (error) {
+      console.error('フォーム送信エラー:', error)
+      alert('エラーが発生しました: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    }
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-gray-900/95 via-black/90 to-purple-900/95 backdrop-blur-sm rounded-3xl shadow-2xl shadow-purple-900/50 p-6 md:p-8 tea-cup-pattern border-2 border-purple-600 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-900/30 to-black/50 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-gray-800/40 to-purple-800/30 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(147,51,234,0.15),transparent_70%)] pointer-events-none" />
+      <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+        <div>
+          <label className="block text-lg font-handwritten text-gray-300 mb-2">
+            議題
+          </label>
+          <input
+            type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border-2 border-purple-600 focus:border-purple-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-purple-900/50"
+            placeholder="例：お金と時間どちらが大切なのか"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-lg font-handwritten text-gray-300 mb-2">
+            アリスの主張
+          </label>
+          <textarea
+            value={alicePosition}
+            onChange={(e) => setAlicePosition(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border-2 border-purple-600 focus:border-purple-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-purple-900/50 min-h-[100px]"
+            placeholder="例：時間の方が大切"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-lg font-handwritten text-gray-300 mb-2">
+            白うさぎの主張
+          </label>
+          <textarea
+            value={rabbitPosition}
+            onChange={(e) => setRabbitPosition(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border-2 border-red-600 focus:border-red-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-red-900/50 min-h-[100px]"
+            placeholder="例：お金の方が大切"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-lg font-handwritten text-gray-300 mb-2">
+            対話回数
+          </label>
+          <input
+            type="number"
+            value={turns}
+            onChange={(e) => handleTurnsChange(parseInt(e.target.value) || 6)}
+            min="2"
+            max="20"
+            step="2"
+            className="w-full px-4 py-3 rounded-xl border-2 border-purple-600 focus:border-purple-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-purple-900/50"
+            required
+          />
+          <p className="text-sm text-gray-400 mt-1">※ 偶数のみ入力可能です（2, 4, 6, 8, 10, 12, 14, 16, 18, 20）</p>
+        </div>
+
+        <motion.button
+          type="submit"
+          className="w-full py-4 bg-gradient-to-r from-purple-800 via-purple-900 to-black text-white rounded-2xl font-retro text-xl shadow-2xl shadow-purple-900/50 relative overflow-hidden border-2 border-purple-600"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+            animate={{ x: ['-100%', '100%'] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+          <span className="relative z-10">⚫ お茶会を始める 🎩 ⚫</span>
+        </motion.button>
+      </form>
+    </div>
+  )
+}
