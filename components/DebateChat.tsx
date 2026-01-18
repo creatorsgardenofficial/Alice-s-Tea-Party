@@ -98,7 +98,7 @@ export default function DebateChat({ messages, isDebating, finalComment }: Debat
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     whileHover={{ scale: 1.05, rotate: message.speaker === 'alice' ? 2 : -2 }}
                   >
-                    <div className="relative z-10 whitespace-pre-wrap break-words">
+                    <div className="relative z-10 whitespace-pre-wrap break-words text-left">
                       {message.message}
                     </div>
                     {message.speaker === 'alice' && (
