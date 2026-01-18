@@ -23,6 +23,9 @@ const patrickHand = Patrick_Hand({
 export const metadata: Metadata = {
   title: 'アリスのお茶会 - AIディベート',
   description: '不思議の国のアリスをモチーフにしたAIディベートアプリ',
+  icons: {
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="70" font-size="80" text-anchor="middle" dominant-baseline="middle">☕</text></svg>',
+  },
 }
 
 export default function RootLayout({
