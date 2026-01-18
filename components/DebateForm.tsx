@@ -87,17 +87,19 @@ export default function DebateForm({ onStart }: DebateFormProps) {
           <label className="block text-lg font-handwritten text-gray-300 mb-2">
             対話回数
           </label>
-          <input
-            type="number"
+          <select
             value={turns}
             onChange={(e) => handleTurnsChange(parseInt(e.target.value) || 10)}
-            min="2"
-            max="20"
-            step="1"
-            className="w-full px-4 py-3 rounded-xl border-2 border-purple-600 focus:border-purple-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-purple-900/50"
+            className="w-full px-4 py-3 rounded-xl border-2 border-purple-600 focus:border-purple-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-purple-900/50 appearance-none cursor-pointer"
             required
-          />
-          <p className="text-sm text-gray-400 mt-1">※ 2回以上20回以下で入力可能です</p>
+          >
+            {Array.from({ length: 19 }, (_, i) => i + 2).map((num) => (
+              <option key={num} value={num} className="bg-gray-800 text-gray-200">
+                {num}回
+              </option>
+            ))}
+          </select>
+          <p className="text-sm text-gray-400 mt-1">※ 2回以上20回以下で選択可能です</p>
         </div>
 
         <motion.button
