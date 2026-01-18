@@ -126,7 +126,7 @@ function calculateScoreChange(
     const lastMessage = conversationHistory[conversationHistory.length - 1]
     if (lastMessage && lastMessage.speaker !== currentSpeaker) {
       // 相手の直前の発言のキーワードを抽出
-      const lastMessageWords = lastMessage.message.split(/[、。！？\s]/).filter(w => w.length > 2)
+      const lastMessageWords = lastMessage.message.split(/[、。！？\s]/).filter((w: string) => w.length > 2)
       const referencesLastMessage = lastMessageWords.some(word => 
         message.includes(word) && word.length >= 3
       )
@@ -182,7 +182,7 @@ function calculateScoreChange(
       }
       
       // 相手の発言を直接引用して反論できているか
-      const opponentWords = lastMessage.message.split(/[、。！？\s]/).filter(w => w.length >= 3)
+      const opponentWords = lastMessage.message.split(/[、。！？\s]/).filter((w: string) => w.length >= 3)
       const directlyRefutes = opponentWords.some(word => 
         message.includes(word) && (hasCritique || hasEvidence)
       )
