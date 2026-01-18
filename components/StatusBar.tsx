@@ -21,8 +21,15 @@ export default function StatusBar({ statuses }: StatusBarProps) {
             <span className="font-handwritten text-lg text-purple-300 flex items-center gap-2">
               <motion.span
                 className="relative w-8 h-8 flex items-center justify-center"
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ 
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.05, 1]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
               >
                 {!aliceImageError ? (
                   <Image
@@ -65,8 +72,15 @@ export default function StatusBar({ statuses }: StatusBarProps) {
             <span className="font-handwritten text-lg text-red-300 flex items-center gap-2">
               <motion.span
                 className="relative w-8 h-8 flex items-center justify-center"
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ 
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.05, 1]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
               >
                 <span className="text-3xl">🐰</span>
               </motion.span>
