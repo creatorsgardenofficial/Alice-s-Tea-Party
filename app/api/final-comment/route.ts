@@ -15,8 +15,6 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.OPENAI_API_KEY
     let responseText = ''
 
-    console.log('[Final-Comment] APIキーの確認:', apiKey ? `設定済み (${apiKey.substring(0, 10)}...)` : '未設定 - モックデータを使用')
-
     const prompts: Record<string, string> = {
       alice: `あなたは「不思議の国のアリス」のアリスです。語尾は「〜なのよ」「〜かしら？」を使ってください。
 
@@ -84,7 +82,6 @@ ${statuses.alice === statuses.rabbit
     }
 
     if (apiKey) {
-      console.log('[Final-Comment] OpenAI APIを呼び出し中...')
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -104,19 +101,13 @@ ${statuses.alice === statuses.rabbit
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
-          console.error('[Final-Comment] OpenAI APIエラー:', response.status, errorData)
           throw new Error(`OpenAI API error: ${response.status}`)
         }
 
         const data = await response.json()
         responseText = data.choices[0]?.message?.content || '...'
-        console.log('[Final-Comment] OpenAI API成功:', responseText)
-        console.log('[Final-Comment] 応答の長さ:', responseText.length, '文字')
-        console.log('[Final-Comment] finish_reason:', data.choices[0]?.finish_reason)
       } catch (error) {
-        console.error('[Final-Comment] OpenAI API呼び出しエラー:', error)
         // エラーが発生した場合、モックデータにフォールバック
-        console.log('[Final-Comment] モックデータにフォールバック')
         const mockComments: Record<string, string[]> = {
           alice: [
             `あなたの言葉、少しだけ心が動いたわ。でも、まだ「${alicePosition}」と思っているのよ。`,
@@ -146,7 +137,6 @@ ${statuses.alice === statuses.rabbit
         responseText = comments[Math.floor(Math.random() * comments.length)]
       }
     } else {
-      console.log('[Final-Comment] モックデータを使用')
       // モックデータ - ユーザーの入力内容を反映
       const mockComments: Record<string, string[]> = {
         alice: [
@@ -182,7 +172,6 @@ ${statuses.alice === statuses.rabbit
       message: responseText,
     })
   } catch (error) {
-    console.error('APIエラー:', error)
     return NextResponse.json(
       { error: 'コメント生成に失敗しました' },
       { status: 500 }

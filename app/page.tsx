@@ -19,14 +19,12 @@ export default function Home() {
   const [error, setError] = useState<string>('')
 
   const handleStartDebate = async (config: DebateConfig) => {
-    console.log('handleStartDebate呼び出し:', config)
     setDebateConfig(config)
     setMessages([])
     setStatuses({ alice: 100, rabbit: 100 })
     setFinalComment('')
     setError('')
     setIsDebating(true)
-    console.log('状態更新完了')
 
     // ディベートを開始
     const debateMessages: DebateMessage[] = []
@@ -48,7 +46,6 @@ export default function Home() {
         await new Promise(resolve => setTimeout(resolve, 2000))
 
         // API呼び出しで発言を生成
-        console.log(`[${i + 1}/${config.turns}] API呼び出し:`, speaker)
         const response = await fetch('/api/debate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -63,23 +60,12 @@ export default function Home() {
           }),
         })
 
-        console.log('APIレスポンス:', response.status, response.statusText)
-
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-          console.error('APIエラー:', errorData)
           throw new Error(errorData.error || `API error: ${response.status}`)
         }
 
         const data = await response.json()
-        console.log('APIレスポンスデータ:', data)
-        
-        // API使用状況を確認
-        if (data.isFromAPI) {
-          console.log('✅✅✅ APIが使用されています！応答:', data.message.substring(0, 50) + '...')
-        } else {
-          console.warn('⚠️⚠️⚠️ モックデータが使用されています！応答:', data.message.substring(0, 50) + '...')
-        }
         
         const newMessage: DebateMessage = {
           speaker,
@@ -173,15 +159,12 @@ export default function Home() {
       setFinalComment(hatterFinal.message)
 
       setMessages([...debateMessages])
-      console.log('ディベート完了')
     } catch (error) {
-      console.error('ディベートエラー:', error)
       const errorMessage = error instanceof Error ? error.message : 'ディベート中にエラーが発生しました'
       setError(errorMessage)
       alert('エラー: ' + errorMessage)
     } finally {
       setIsDebating(false)
-      console.log('ディベート終了')
     }
   }
 

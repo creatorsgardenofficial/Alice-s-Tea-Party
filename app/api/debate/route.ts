@@ -207,7 +207,6 @@ function calculateScoreChange(
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[API] /api/debate called')
   try {
     const body = await request.json()
     const {
@@ -223,13 +222,6 @@ export async function POST(request: NextRequest) {
     // 会話履歴を構築（前回の発言を含む）
     // 最後の数件のみを送信（コンテキストウィンドウの節約）
     const recentHistory = conversationHistory.slice(-10) // 直近10件に増やしました（より多くのコンテキスト）
-    
-    console.log('[API] ========== 会話履歴の確認 ==========')
-    console.log('[API] 受け取った会話履歴の数:', conversationHistory.length)
-    console.log('[API] 最近の会話履歴（詳細）:')
-    recentHistory.forEach((msg: any, idx: number) => {
-      console.log(`  ${idx + 1}. [${msg.speaker}] ${msg.message}`)
-    })
     
     // 会話履歴をChatGPTのメッセージ形式に変換
     // アリス = user、白うさぎ = assistant として扱う
@@ -254,10 +246,6 @@ export async function POST(request: NextRequest) {
         opponentLastMessage = recentHistory[recentHistory.length - 2].message
       }
     }
-    
-    console.log('[API] 相手の直前の発言:', opponentLastMessage || '(なし - 最初の発言)')
-    console.log('[API] 現在の話者:', currentSpeaker)
-    console.log('[API] 会話履歴を使用したメッセージ数:', messages.length)
     
     // システムプロンプトを作成（会話履歴を必ず使うことを強調）
     // 会話履歴がある場合とない場合で処理を分ける
@@ -344,26 +332,12 @@ export async function POST(request: NextRequest) {
 - 相手の発言を引用する際は「と言いましたが」「と言いましたけど」を使用してください。「と言ったが」「と言ったけど」は使わないでください`
     }
 
-    // デバッグ：送信する全メッセージを表示
-    console.log('[API] ========== 送信する全メッセージ ==========')
-    console.log('[API] System Prompt:', systemPrompt.substring(0, 100) + '...')
-    console.log('[API] Messages配列:')
-    messages.forEach((msg: any, idx: number) => {
-      console.log(`  ${idx + 1}. [${msg.role}]: "${msg.content}"`)
-    })
-    console.log('[API] ==========================================')
-
     // OpenAI API呼び出し（環境変数がない場合はモックデータを使用）
     const apiKey = process.env.OPENAI_API_KEY
     let responseText = ''
     let scoreChange = 0
 
-    console.log('[API] ==========================================')
-    console.log('[API] APIキーの確認:', apiKey ? `✅ 設定済み (${apiKey.substring(0, 15)}...)` : '❌ 未設定 - モックデータを使用')
-    console.log('[API] ==========================================')
-
     if (apiKey) {
-      console.log('[API] OpenAI APIを呼び出し中...')
       try {
         // メッセージ配列を構築（会話履歴を確実に含める）
         // 重要：会話履歴がある場合、最後の発言をuserメッセージとして明示的に追加
@@ -396,35 +370,10 @@ export async function POST(request: NextRequest) {
 単なる反論ではなく、論理的な根拠を持った反論をしてください。`
             }
           ]
-          
-          console.log('[API] ========== 会話履歴再構築 ==========')
-          console.log('[API] 最後の発言（role）:', lastMessage.role)
-          console.log('[API] 最後の発言（内容）:', lastMessage.content.substring(0, 80))
-          console.log('[API] 現在の話者:', currentSpeaker)
-          console.log('[API] 応答すべき発言:', lastMessage.content.substring(0, 80))
-          console.log('[API] ==========================================')
         } else {
           // 会話履歴がない場合（最初の発言）
           // メッセージ履歴は空のまま
-          console.log('[API] 会話履歴なし - 最初の発言')
         }
-        
-        // デバッグ：最後の発言を確認
-        console.log('[API] ========== 会話履歴の状態 ==========')
-        console.log('[API] 会話履歴の件数:', messages.length)
-        if (messages.length > 0) {
-          const lastMsg = messages[messages.length - 1]
-          console.log('[API] 最後の発言:', lastMsg.role, '-', lastMsg.content.substring(0, 80))
-          console.log('[API] 現在の話者:', currentSpeaker)
-          console.log('[API] 最後の発言の話者:', lastMsg.role === 'user' ? 'alice' : 'rabbit')
-        }
-        console.log('[API] ==========================================')
-        
-        console.log('[API] ========== 最終的に送信するメッセージ配列 ==========')
-        fullMessages.forEach((msg: any, idx: number) => {
-          console.log(`  ${idx + 1}. [${msg.role}]: ${msg.content.substring(0, 100)}${msg.content.length > 100 ? '...' : ''}`)
-        })
-        console.log('[API] ==========================================')
         
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -445,16 +394,11 @@ export async function POST(request: NextRequest) {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}))
-          console.error('[API] OpenAI APIエラー:', response.status, errorData)
           throw new Error(`OpenAI API error: ${response.status}`)
         }
 
         const data = await response.json()
         responseText = data.choices[0]?.message?.content || '...'
-        console.log('[API] ✅✅✅ OpenAI API成功！ ✅✅✅')
-        console.log('[API] 完全な応答:', responseText)
-        console.log('[API] 応答の長さ:', responseText.length, '文字')
-        console.log('[API] 会話履歴メッセージ数:', messages.length, '件')
         
         // テンプレート的な応答を検出
         const templatePatterns = [
@@ -465,36 +409,11 @@ export async function POST(request: NextRequest) {
           `ふぅ、${topic}については、${rabbitPosition}こそが真実なのですぞ！`,
         ]
         const isTemplate = templatePatterns.some(pattern => responseText.includes(pattern))
-        if (isTemplate) {
-          console.error('[API] ❌❌❌ テンプレート的な応答が検出されました！ ❌❌❌')
-          console.error('[API] 応答内容:', responseText)
-          console.error('[API] この応答は会話履歴を無視しています！')
-        } else {
-          console.log('[API] ✅ 応答はテンプレート的ではありません')
-        }
         
-        // 会話履歴の最後の発言が応答に含まれているか確認
-        if (messages.length > 0) {
-          const lastHistoryMsg = messages[messages.length - 1].content
-          const lastHistoryWords = lastHistoryMsg.split(' ').slice(0, 3).join(' ')
-          if (!responseText.includes(lastHistoryWords.substring(0, 10)) && lastHistoryWords.length > 5) {
-            console.warn('[API] ⚠️ 警告：応答が会話履歴の最後の発言を参照していない可能性があります')
-          }
-        }
-        
-        console.log('[API] ==========================================')
       } catch (error) {
-        console.error('[API] ❌❌❌ OpenAI API呼び出しエラー:', error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         
-        // 429エラー（クォータ超過）の場合
-        if (errorMessage.includes('429') || errorMessage.includes('quota')) {
-          console.error('[API] ❌ APIクォータが上限に達しています！')
-          console.error('[API] OpenAIのアカウントでクレジットを追加するか、プランをアップグレードしてください。')
-        }
-        
         // エラーが発生した場合、会話履歴を考慮したモックデータにフォールバック
-        console.log('[API] ⚠️⚠️⚠️ モックデータにフォールバック ⚠️⚠️⚠️')
         
         // 会話履歴がある場合は、最後の発言を参照する
         if (hasHistory && messages.length > 0) {
@@ -523,8 +442,6 @@ export async function POST(request: NextRequest) {
           
           const variation = variations[turn % variations.length]
           responseText = currentSpeaker === 'alice' ? variation.alice : variation.rabbit
-          
-          console.log('[API] ⚠️ モックデータ生成（会話履歴を参照）:', responseText.substring(0, 60))
         } else {
           // 最初の発言（60文字以内）
           const mockResponses = {
@@ -540,10 +457,6 @@ export async function POST(request: NextRequest) {
         }
       }
     } else {
-      console.log('[API] ⚠️⚠️⚠️ モックデータを使用 ⚠️⚠️⚠️')
-      console.log('[API] 注意：実際のChatGPT APIは呼び出されていません！')
-      console.log('[API] .env.localファイルを確認してください。')
-      
       // モックデータ（APIキーがない場合）- 会話履歴を考慮
       if (hasHistory && messages.length > 0) {
         const lastMessage = messages[messages.length - 1]
@@ -571,8 +484,6 @@ export async function POST(request: NextRequest) {
         
         const variation = variations[turn % variations.length]
         responseText = currentSpeaker === 'alice' ? variation.alice : variation.rabbit
-        
-        console.log('[API] ⚠️ モックデータ生成（会話履歴を参照）:', responseText.substring(0, 60))
       } else {
         // 最初の発言（60文字以内）
         const mockResponses = {
@@ -596,12 +507,6 @@ export async function POST(request: NextRequest) {
       currentSpeaker,
       opponentPosition
     )
-    
-    console.log('[API] スコア計算結果:', {
-      message: responseText.substring(0, 40),
-      scoreChange,
-      length: responseText.length
-    })
 
     return NextResponse.json({
       message: responseText,
@@ -609,7 +514,6 @@ export async function POST(request: NextRequest) {
       isFromAPI: !!apiKey && responseText !== '', // APIが使われたかどうかのフラグ
     })
   } catch (error) {
-    console.error('APIエラー:', error)
     return NextResponse.json(
       { error: 'ディベート生成に失敗しました' },
       { status: 500 }

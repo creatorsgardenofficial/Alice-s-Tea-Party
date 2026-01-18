@@ -22,7 +22,6 @@ export default function DebateForm({ onStart }: DebateFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('フォーム送信:', { topic, alicePosition, rabbitPosition, turns })
     try {
       onStart({
         topic,
@@ -30,9 +29,7 @@ export default function DebateForm({ onStart }: DebateFormProps) {
         rabbitPosition,
         turns,
       })
-      console.log('onStart呼び出し完了')
     } catch (error) {
-      console.error('フォーム送信エラー:', error)
       alert('エラーが発生しました: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
   }
