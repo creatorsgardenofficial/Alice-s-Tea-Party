@@ -63,7 +63,13 @@ export default function StatusBar({ statuses }: StatusBarProps) {
         <div>
           <div className="flex justify-between items-center mb-2">
             <span className="font-handwritten text-lg text-red-300 flex items-center gap-2">
-              <span className="text-3xl">🐰</span>
+              <motion.span
+                className="relative w-8 h-8 flex items-center justify-center"
+                animate={{ rotate: [0, -10, 10, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <span className="text-3xl">🐰</span>
+              </motion.span>
               白うさぎの確信度
             </span>
             <span className="font-retro text-xl text-red-400 drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]">
