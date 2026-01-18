@@ -12,29 +12,23 @@ export default function DebateForm({ onStart }: DebateFormProps) {
   const [topic, setTopic] = useState('お金と時間どちらが大切なのか')
   const [alicePosition, setAlicePosition] = useState('時間の方が大切。なぜならば、お金があっても時間がなくては、そのお金は使えない。時間さえあれば、十分な時間を使って、なんでも叶えることができる。')
   const [rabbitPosition, setRabbitPosition] = useState('お金の方が大切。なぜならば、時間がいくらあっても、お金がなければ活動できることは限られてしまう。お金さえあれば、短い時間でも有意義に過ごすことができる。')
-  const [turns, setTurns] = useState(6)
+  const [turns, setTurns] = useState(10)
 
   const handleTurnsChange = (value: number) => {
-    // 偶数に調整（2以上、20以下）
-    let adjustedValue = Math.max(2, Math.min(20, value))
-    if (adjustedValue % 2 !== 0) {
-      // 奇数の場合は最も近い偶数に調整
-      adjustedValue = adjustedValue < 20 ? adjustedValue + 1 : adjustedValue - 1
-    }
+    // 2以上、20以下の範囲に制限
+    const adjustedValue = Math.max(2, Math.min(20, value))
     setTurns(adjustedValue)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // 念のため偶数であることを確認
-    const finalTurns = turns % 2 === 0 ? turns : turns + 1
-    console.log('フォーム送信:', { topic, alicePosition, rabbitPosition, turns: finalTurns })
+    console.log('フォーム送信:', { topic, alicePosition, rabbitPosition, turns })
     try {
       onStart({
         topic,
         alicePosition,
         rabbitPosition,
-        turns: finalTurns,
+        turns,
       })
       console.log('onStart呼び出し完了')
     } catch (error) {
@@ -96,14 +90,14 @@ export default function DebateForm({ onStart }: DebateFormProps) {
           <input
             type="number"
             value={turns}
-            onChange={(e) => handleTurnsChange(parseInt(e.target.value) || 6)}
+            onChange={(e) => handleTurnsChange(parseInt(e.target.value) || 10)}
             min="2"
             max="20"
-            step="2"
+            step="1"
             className="w-full px-4 py-3 rounded-xl border-2 border-purple-600 focus:border-purple-400 focus:outline-none font-handwritten text-lg bg-gray-800/90 text-gray-200 shadow-md transition-all hover:shadow-lg hover:shadow-purple-900/50"
             required
           />
-          <p className="text-sm text-gray-400 mt-1">※ 偶数のみ入力可能です（2, 4, 6, 8, 10, 12, 14, 16, 18, 20）</p>
+          <p className="text-sm text-gray-400 mt-1">※ 2回以上20回以下で入力可能です</p>
         </div>
 
         <motion.button
