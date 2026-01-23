@@ -9,9 +9,9 @@ interface DebateFormProps {
 }
 
 export default function DebateForm({ onStart }: DebateFormProps) {
-  const [topic, setTopic] = useState('お金と時間どちらが大切なのか')
-  const [alicePosition, setAlicePosition] = useState('時間の方が大切。なぜならば、お金があっても時間がなくては、そのお金は使えない。時間さえあれば、十分な時間を使って、なんでも叶えることができる。')
-  const [rabbitPosition, setRabbitPosition] = useState('お金の方が大切。なぜならば、時間がいくらあっても、お金がなければ活動できることは限られてしまう。お金さえあれば、短い時間でも有意義に過ごすことができる。')
+  const [topic, setTopic] = useState('')
+  const [alicePosition, setAlicePosition] = useState('')
+  const [rabbitPosition, setRabbitPosition] = useState('')
   const [turns, setTurns] = useState(10)
 
   const handleTurnsChange = (value: number) => {
